@@ -1,30 +1,39 @@
+import React, { useState } from "react";
+import { useDrop } from "react-dnd";
 import { LayoutColumn } from "./LayoutColumn";
 
-interface ColumnConfig {
-  components: Array<"input" | "image" | "demo">;
-}
 
-interface LayoutRowProps {
-  index: number;
-  columns: ColumnConfig[];
-  delay?: number;
-}
+export const LayoutRow = ({ row }) => {
+  const [columns, setColumns] = useState([]);
 
-export const LayoutRow = ({ index, columns, delay = 0 }: LayoutRowProps) => {
+  // Accept only COLUMN drop
+  const [, drop] = useDrop(() => ({
+    accept: "COLUMN",
+    drop: () => {
+      setColumns((prev) => [
+        ...prev,
+        { id: crypto.randomUUID(), items: [] }
+      ]);
+    },
+  }));
+
   return (
-    <div 
-      className="layout-row animate-fade-up"
-      style={{ animationDelay: `${delay}ms` }}
+    <div
+      ref={drop}
+      className="p-4 rounded-2xl border border-dashed relative bg-row-bg"
     >
-      <span className="badge-row">row{index}</span>
-      
-      <div className="flex gap-4 pt-3 flex-wrap lg:flex-nowrap">
-        {columns.map((col, i) => (
+      {/* Row Index Label */}
+      <span className="absolute -top-3 left-4 bg-red-100 text-red-700 px-2 py-0.5 rounded-lg text-xs">
+        row
+      </span>
+
+      {/* Columns */}
+      <div className="flex gap-4 pt-3 flex-wrap">
+        {columns.map((col, index) => (
           <LayoutColumn
-            key={i}
-            index={i}
-            components={col.components}
-            delay={delay + 100 + i * 100}
+            key={col.id}
+            column={col}
+            index={index}
           />
         ))}
       </div>

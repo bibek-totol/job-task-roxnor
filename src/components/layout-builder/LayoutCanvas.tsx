@@ -1,58 +1,52 @@
+import React, { useState } from "react";
+import { useDrop } from "react-dnd";
 import { LayoutRow } from "./LayoutRow";
-import { TrashZone } from "./TrashZone";
 
-// Sample layout configuration
-const layoutConfig = [
-  {
-    columns: [
-      { components: ["image" as const, "input" as const] },
-      { components: ["demo" as const] },
-      { components: ["input" as const] },
-    ],
-  },
-  {
-    columns: [
-      { components: ["demo" as const, "image" as const] },
-      { components: ["input" as const, "demo" as const] },
-    ],
-  },
-];
 
 export const LayoutCanvas = () => {
+  const [rows, setRows] = useState([]);
+
+  // Accept only ROW items
+  const [, drop] = useDrop(() => ({
+    accept: "ROW",
+    drop: () => {
+      setRows((prev) => [
+        ...prev,
+        { id: crypto.randomUUID(), columns: [] }
+      ]);
+    },
+  }));
+
   return (
-    <main className="ml-[260px] min-h-screen p-8">
+    <main
+      ref={drop}
+      className="ml-[260px] min-h-screen p-8"
+    >
       <div className="max-w-6xl mx-auto">
+        
         {/* Header */}
-        <div className="mb-8 ">
-          <h2 className="text-2xl font-bold text-foreground tracking-tight">Canvas</h2>
-          <p className="text-muted-foreground mt-1">Build your layout by arranging rows, columns, and components</p>
+        <div className="mb-6">
+          <h2 className="text-2xl font-bold">Canvas</h2>
+          <p className="text-sm text-muted-foreground">
+            Build your layout by arranging rows, columns and components
+          </p>
         </div>
-        
-        {/* Canvas Area */}
-        <div className="p-6 rounded-3xl bg-card/50 border border-border/50 shadow-soft " >
+
+        {/* Canvas box */}
+        <div className="p-6 rounded-3xl bg-white border shadow-sm">
           <div className="flex flex-col gap-6">
-            {layoutConfig.map((row, index) => (
-              <LayoutRow
-                key={index}
-                index={index}
-                columns={row.columns}
-                delay={200 + index * 150}
-              />
+
+            {/* Render rows */}
+            {rows.map((row) => (
+              <LayoutRow key={row.id} row={row} />
             ))}
-            
-            {/* Empty row placeholder */}
-            <div 
-              className="flex items-center justify-center h-32 border-2 border-dashed border-border/60 rounded-2xl transition-colors hover:border-primary/30 hover:bg-primary/5 cursor-pointer "
-              style={{ animationDelay: '600ms' }}
-            >
-              <p className="text-sm text-muted-foreground">+ Add new row</p>
+
+            {/* Drop row hint */}
+            <div className="flex items-center justify-center h-24 border-2 border-dashed rounded-2xl text-sm text-muted-foreground">
+              Drag a Row from Sidebar and drop here
             </div>
+
           </div>
-        </div>
-        
-        {/* Trash Zone */}
-        <div className="flex justify-center mt-8">
-          <TrashZone delay={700} />
         </div>
       </div>
     </main>

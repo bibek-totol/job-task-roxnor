@@ -1,74 +1,84 @@
-import { Rows3, Columns3, Box, Image, TextCursorInput, Sparkles } from "lucide-react";
+import React from "react";
+import { useDrag } from "react-dnd";
+import {
+  Rows3,
+  Columns3,
+  Image as ImageIcon,
+  TextCursorInput,
+  Box,
+  Sparkles
+} from "lucide-react";
 
-interface SidebarItemProps {
-  icon: React.ReactNode;
-  label: string;
-  delay?: number;
-}
+const SidebarItem = ({ label, type, icon: Icon }: { label: string; type: ComponentKind | "ROW" | "COLUMN"; icon: any }) => {
+  const isComponent = type === "INPUT" || type === "IMAGE" || type === "DEMO";
 
-const SidebarItem = ({ icon, label, delay = 0 }: SidebarItemProps) => (
-  <div 
-    className="sidebar-item animate-fade-up"
-    style={{ animationDelay: `${delay}ms` }}
-  >
-    <span className="flex items-center justify-center w-10 h-10 rounded-xl bg-secondary/80">
-      {icon}
-    </span>
-    <span>{label}</span>
-  </div>
-);
+  const [{ isDragging }, drag] = useDrag(() => ({
+    type: isComponent ? "COMPONENT" : type, 
+    item: { type: type.toLowerCase() },      
+    collect: (m) => ({ isDragging: !!m.isDragging() }),
+  }));
 
-const menuItems = [
-  { icon: <Rows3 className="w-5 h-5" />, label: "Row" },
-  { icon: <Columns3 className="w-5 h-5" />, label: "Column" },
-  { icon: <Box className="w-5 h-5" />, label: "Demo Item" },
-  { icon: <Image className="w-5 h-5" />, label: "Image" },
-  { icon: <TextCursorInput className="w-5 h-5" />, label: "Input" },
-];
+
+  return (
+    <div
+      ref={drag}
+      className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer hover:bg-primary/10 ${
+        isDragging ? "opacity-50" : "opacity-100"
+      }`}
+    >
+      <div className="w-8 h-8 flex items-center justify-center rounded-md bg-secondary/30">
+        <Icon className="w-4 h-4" />
+      </div>
+
+      <div>
+        <div className="text-sm font-medium">{label}</div>
+      </div>
+    </div>
+  );
+};
 
 export const Sidebar = () => {
+  const menu = [
+    { label: "Row", type: "ROW", icon: Rows3 },
+    { label: "Column", type: "COLUMN", icon: Columns3 },
+    { label: "Input", type: "INPUT", icon: TextCursorInput },
+    { label: "Image", type: "IMAGE", icon: ImageIcon },
+    { label: "Demo", type: "DEMO", icon: Box },
+  ];
+
   return (
-    <aside className="fixed left-0 top-0 h-screen w-[260px] glass-strong shadow-soft z-50">
-      <div className="flex flex-col h-full p-5">
-        {/* Logo */}
-        <div className="flex items-center gap-3 px-2 mb-8 animate-fade-up">
-          <div className="flex items-center justify-center w-11 h-11 rounded-2xl bg-gradient-to-br from-primary to-primary/70 shadow-glow">
-            <Sparkles className="w-6 h-6 text-primary-foreground" />
-          </div>
-          <div>
-            <h1 className="text-lg font-bold text-foreground tracking-tight">Layout Builder</h1>
-            <p className="text-xs text-muted-foreground">Drag & Drop</p>
-          </div>
+    <aside className="fixed left-0 top-0 h-screen w-[260px] p-6 bg-gray-50 border-r">
+      {/* Header */}
+      <div className="flex items-center gap-3 mb-6">
+        <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-primary/20">
+          <Sparkles className="w-6 h-6" />
         </div>
-        
-        {/* Divider */}
-        <div className="h-px bg-border/60 mx-2 mb-6" />
-        
-        {/* Menu Label */}
-        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-4 mb-3 animate-fade-up" style={{ animationDelay: '50ms' }}>
-          Components
-        </p>
-        
-        {/* Menu Items */}
-        <nav className="flex flex-col gap-1.5">
-          {menuItems.map((item, index) => (
-            <SidebarItem
-              key={item.label}
-              icon={item.icon}
-              label={item.label}
-              delay={100 + index * 50}
-            />
-          ))}
-        </nav>
-        
-        {/* Bottom Section */}
-        <div className="mt-auto px-2">
-          <div className="p-4 rounded-2xl bg-gradient-to-br from-primary/5 to-primary/10 border border-primary/10 animate-fade-up" style={{ animationDelay: '400ms' }}>
-            <p className="text-sm font-medium text-foreground mb-1">Pro Tip</p>
-            <p className="text-xs text-muted-foreground leading-relaxed">
-              Drag components onto the canvas to start building your layout.
-            </p>
-          </div>
+        <div>
+          <h1 className="text-lg font-bold">Layout Builder</h1>
+          <div className="text-xs text-muted-foreground">Drag & Drop</div>
+        </div>
+      </div>
+
+      {/* Menu */}
+      <div className="uppercase text-xs font-semibold mb-3">Components</div>
+
+      <div className="flex flex-col gap-2">
+        {menu.map((m) => (
+          <SidebarItem
+            key={m.label}
+            label={m.label}
+            type={m.type}
+            icon={m.icon}
+          />
+        ))}
+      </div>
+
+      {/* Pro Tip */}
+      <div className="mt-6 p-3 rounded-lg bg-violet-50 text-sm">
+        <strong>Pro Tip</strong>
+        <div className="text-xs text-muted-foreground mt-1">
+          Drag Row first, then drop Columns inside it.
+          Components (Input, Image, Demo) must be dropped inside Columns.
         </div>
       </div>
     </aside>

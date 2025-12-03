@@ -1,46 +1,25 @@
-import { Image, TextCursorInput, FileText } from "lucide-react";
+import React from "react";
+import { FileText, Image, TextCursorInput } from "lucide-react";
+import type { ComponentNode } from "./types";
 
-type ComponentType = "input" | "image" | "demo";
+export const ComponentCard: React.FC<{ comp: ComponentNode }> = ({ comp }) => {
+  const cfg = {
+    input: { title: "Input Component", description: "Text input field", Icon: TextCursorInput },
+    image: { title: "Image Component", description: "Image placeholder", Icon: Image },
+    demo: { title: "Demo Component", description: "Sample content block", Icon: FileText },
+  } as const;
 
-interface ComponentCardProps {
-  type: ComponentType;
-  delay?: number;
-}
+  const { title, description, Icon } = cfg[comp.kind];
 
-const componentConfig = {
-  input: {
-    icon: <TextCursorInput className="w-4 h-4 text-muted-foreground" />,
-    title: "Input Component",
-    description: "Text input field",
-  },
-  image: {
-    icon: <Image className="w-4 h-4 text-muted-foreground" />,
-    title: "Image Component",
-    description: "Image placeholder",
-  },
-  demo: {
-    icon: <FileText className="w-4 h-4 text-muted-foreground" />,
-    title: "Demo Component",
-    description: "Sample content block",
-  },
-};
-
-export const ComponentCard = ({ type, delay = 0 }: ComponentCardProps) => {
-  const config = componentConfig[type];
-  
   return (
-    <div 
-      className="component-card animate-fade-up"
-      style={{ animationDelay: `${delay}ms` }}
-    >
-      <div className="flex items-start gap-3">
-        <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-secondary/60 shrink-0">
-          {config.icon}
-        </div>
-        <div className="min-w-0">
-          <h4 className="text-sm font-medium text-foreground truncate">{config.title}</h4>
-          <p className="text-xs text-muted-foreground mt-0.5">{config.description}</p>
-        </div>
+    <div className="component-card p-3 bg-white rounded-md border flex items-start gap-3 shadow-sm">
+      <div className="w-9 h-9 rounded-md bg-secondary/20 flex items-center justify-center">
+        <Icon className="w-4 h-4" />
+      </div>
+
+      <div className="min-w-0 flex-1">
+        <div className="text-sm font-medium truncate">{title}</div>
+        <div className="text-xs text-muted-foreground">{description}</div>
       </div>
     </div>
   );

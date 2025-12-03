@@ -1,31 +1,46 @@
+import React from "react";
+import { useDrop } from "react-dnd";
 import { ComponentCard } from "./ComponentCard";
+import type { ComponentNode, ComponentKind } from "./types";
 
-interface LayoutColumnProps {
+type LayoutColumnProps = {
+  column: { items: ComponentNode[] };
   index: number;
-  components?: Array<"input" | "image" | "demo">;
-  delay?: number;
-}
+};
 
-export const LayoutColumn = ({ index, components = [], delay = 0 }: LayoutColumnProps) => {
+// Drag item matches ComponentKind
+type DragItem = {
+  type: ComponentKind;
+};
+
+export const LayoutColumn: React.FC<LayoutColumnProps> = ({ column, index }) => {
+  const [, drop] = useDrop<DragItem, void, unknown>({
+    accept: "COMPONENT",
+    drop: (item) => {
+      column.items.push({
+        id: crypto.randomUUID(),
+        kind: item.type, // now type-safe
+      });
+    },
+  });
+
   return (
-    <div 
-      className="layout-column flex-1 min-w-[180px] animate-fade-up"
-      style={{ animationDelay: `${delay}ms` }}
+    <div
+      ref={drop}
+      className="layout-column flex-1 min-w-[200px] p-3 rounded-lg border bg-column-bg"
     >
-      <span className="badge-column">column{index}</span>
-      
-      <div className="flex flex-col gap-3 pt-2">
-        {components.length > 0 ? (
-          components.map((type, i) => (
-            <ComponentCard 
-              key={`${type}-${i}`} 
-              type={type} 
-              delay={delay + 100 + i * 50}
-            />
+      <span className="badge-column text-xs inline-block mb-2">
+        column{index}
+      </span>
+
+      <div className="flex flex-col gap-3">
+        {column.items.length > 0 ? (
+          column.items.map((comp) => (
+            <ComponentCard key={comp.id} comp={comp} />
           ))
         ) : (
-          <div className="flex items-center justify-center h-20 border border-dashed border-column-border/50 rounded-lg">
-            <p className="text-xs text-muted-foreground">Drop components here</p>
+          <div className="h-20 border border-dashed rounded-lg flex items-center justify-center text-xs text-muted-foreground">
+            Drop components here
           </div>
         )}
       </div>
