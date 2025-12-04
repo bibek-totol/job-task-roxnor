@@ -1,49 +1,42 @@
 import React from "react";
 import { useDrop } from "react-dnd";
 import { ComponentCard } from "./ComponentCard";
-import type { ComponentNode, ComponentKind } from "./types";
+import type { ComponentKind } from "./types";
 
-type LayoutColumnProps = {
-  column: { items: ComponentNode[] };
-  index: number;
-};
+export const LayoutColumn = ({ column, rowIndex, colIndex, setCanvas }) => {
 
-// Drag item matches ComponentKind
-type DragItem = {
-  type: ComponentKind;
-};
-
-export const LayoutColumn: React.FC<LayoutColumnProps> = ({ column, index }) => {
-  const [, drop] = useDrop<DragItem, void, unknown>({
+  const [, drop] = useDrop({
     accept: "COMPONENT",
-    drop: (item) => {
-      column.items.push({
-        id: crypto.randomUUID(),
-        kind: item.type, // now type-safe
+    drop: (item: { type: ComponentKind }) => {
+      setCanvas(prev => {
+        const newRows = [...prev.rows];
+        newRows[rowIndex].columns[colIndex].components.push({
+          id: crypto.randomUUID(),
+          kind: item.type
+        });
+
+        return { ...prev, rows: newRows };
       });
-    },
+    }
   });
 
   return (
-    <div
-      ref={drop}
-      className="layout-column flex-1 min-w-[200px] p-3 rounded-lg border bg-column-bg"
-    >
-      <span className="badge-column text-xs inline-block mb-2">
-        column{index}
-      </span>
+    <div ref={drop} className="flex-1 min-w-[200px] p-3 rounded-lg border-4 ">
 
-      <div className="flex flex-col gap-3">
-        {column.items.length > 0 ? (
-          column.items.map((comp) => (
+      <span className="text-xs block mb-2">column{colIndex}</span>
+
+      <div className="flex flex-col gap-2">
+        {column.components.length > 0 ? (
+          column.components.map(comp => (
             <ComponentCard key={comp.id} comp={comp} />
           ))
         ) : (
-          <div className="h-20 border border-dashed rounded-lg flex items-center justify-center text-xs text-muted-foreground">
+          <div className="h-20 border-2 border-dashed rounded-lg flex items-center justify-center text-xs">
             Drop components here
           </div>
         )}
       </div>
+
     </div>
   );
 };

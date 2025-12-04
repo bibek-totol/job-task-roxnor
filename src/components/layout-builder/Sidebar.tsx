@@ -8,6 +8,7 @@ import {
   Box,
   Sparkles
 } from "lucide-react";
+import { ComponentKind } from "./types";
 
 const SidebarItem = ({ label, type, icon: Icon }: { label: string; type: ComponentKind | "ROW" | "COLUMN"; icon: any }) => {
   const isComponent = type === "INPUT" || type === "IMAGE" || type === "DEMO";
