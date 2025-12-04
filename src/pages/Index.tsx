@@ -6,7 +6,7 @@ import { LayoutCanvas } from "../components/layout-builder/LayoutCanvas";
 export default function App() {
   return (
     <DndProvider backend={HTML5Backend}>
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-gradient-to-r from-[#08010F] via-[#380996] to-[#240404]">
         <Sidebar />
         <LayoutCanvas />
       </div>

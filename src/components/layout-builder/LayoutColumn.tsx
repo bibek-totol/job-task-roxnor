@@ -21,7 +21,7 @@ export const LayoutColumn = ({ column, rowIndex, colIndex, setCanvas }) => {
   });
 
   return (
-    <div ref={drop} className="flex-1 min-w-[200px] p-3 rounded-lg border-4 ">
+    <div ref={drop} className="flex-1 min-w-[200px] p-3 rounded-lg border-4  border-slate-400">
 
       <span className="text-xs block mb-2">column{colIndex}</span>
 
@@ -31,7 +31,7 @@ export const LayoutColumn = ({ column, rowIndex, colIndex, setCanvas }) => {
             <ComponentCard key={comp.id} comp={comp} />
           ))
         ) : (
-          <div className="h-20 border-2 border-dashed rounded-lg flex items-center justify-center text-xs">
+          <div className="h-20 text-muted-foreground  rounded-lg flex items-center justify-center text-md">
             Drop components here
           </div>
         )}

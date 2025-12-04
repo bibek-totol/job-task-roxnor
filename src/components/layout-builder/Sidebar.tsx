@@ -10,24 +10,33 @@ import {
 } from "lucide-react";
 import { ComponentKind } from "./types";
 
-const SidebarItem = ({ label, type, icon: Icon }: { label: string; type: ComponentKind | "ROW" | "COLUMN"; icon: any }) => {
+const SidebarItem = ({ label, type, icon: Icon }) => {
   const isComponent = type === "INPUT" || type === "IMAGE" || type === "DEMO";
 
+  
+  const colors = {
+    ROW: "bg-blue-200",
+    COLUMN: "bg-purple-400",
+    INPUT: "bg-green-200",
+    IMAGE: "bg-yellow-200",
+    DEMO: "bg-pink-200",
+  };
+
   const [{ isDragging }, drag] = useDrag(() => ({
-    type: isComponent ? "COMPONENT" : type, 
-    item: { type: type.toLowerCase() },      
+    type: isComponent ? "COMPONENT" : type,
+    item: { type: type.toLowerCase() },
     collect: (m) => ({ isDragging: !!m.isDragging() }),
   }));
-
 
   return (
     <div
       ref={drag}
-      className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer hover:bg-primary/10 ${
-        isDragging ? "opacity-50" : "opacity-100"
+      className={`flex items-center gap-3 p-2 text-black hover:text-white rounded-lg cursor-pointer hover:bg-primary/80 ${colors[type]} ${
+        isDragging ? "opacity-70" : "opacity-100"
       }`}
     >
-      <div className="w-8 h-8 flex items-center justify-center rounded-md bg-secondary/30">
+      {/* Colored background based on type */}
+      <div className={`w-8 h-8 flex items-center justify-center rounded-md `}>
         <Icon className="w-4 h-4" />
       </div>
 
@@ -37,6 +46,7 @@ const SidebarItem = ({ label, type, icon: Icon }: { label: string; type: Compone
     </div>
   );
 };
+
 
 export const Sidebar = () => {
   const menu = [
@@ -48,7 +58,7 @@ export const Sidebar = () => {
   ];
 
   return (
-    <aside className="fixed left-0 top-0 h-screen w-[260px] p-6 bg-gray-50 border-r">
+    <aside className="fixed left-0 top-0 h-screen w-[260px] p-6 text-white border-r-black">
       {/* Header */}
       <div className="flex items-center gap-3 mb-6">
         <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-primary/20">
@@ -75,11 +85,12 @@ export const Sidebar = () => {
       </div>
 
       {/* Pro Tip */}
-      <div className="mt-6 p-3 rounded-lg bg-violet-50 text-sm">
+      <div className="mt-6 p-3 rounded-lg bg-card text-sm">
         <strong>Pro Tip</strong>
-        <div className="text-xs text-muted-foreground mt-1">
+        <div className="text-xs text-muted-foreground mt-1 text-green-300">
           Drag Row first, then drop Columns inside it.
           Components (Input, Image, Demo) must be dropped inside Columns.
+          You can drop full Row in trash box.
         </div>
       </div>
     </aside>
