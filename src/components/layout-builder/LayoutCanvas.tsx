@@ -77,6 +77,34 @@ export const LayoutCanvas = () => {
     });
   };
 
+  const resizeColumn = (rowIndex: number, colIndex: number, deltaX: number, rowWidth: number) => {
+    setCanvas((prev) => {
+      const updated = structuredClone(prev);
+      const row = updated.rows[rowIndex];
+      const col = row.columns[colIndex];
+      const nextCol = row.columns[colIndex + 1];
+
+      if (!nextCol) return prev;
+
+      if (row.columns.some((c) => c.width === undefined)) {
+        row.columns.forEach((c) => (c.width = 1));
+      }
+
+      const totalWeight = row.columns.reduce((sum, c) => sum + (c.width || 1), 0);
+      const deltaWeight = (deltaX / rowWidth) * totalWeight;
+
+      const newColWidth = (col.width || 1) + deltaWeight;
+      const newNextColWidth = (nextCol.width || 1) - deltaWeight;
+
+      if (newColWidth < 0.1 || newNextColWidth < 0.1) return prev;
+
+      col.width = newColWidth;
+      nextCol.width = newNextColWidth;
+
+      return updated;
+    });
+  };
+
   return (
     <main ref={drop} className="flex-1 ml-0 md:ml-60 min-h-screen p-4 sm:p-6">
       <div className="max-w-[870px] mx-auto relative">
@@ -90,6 +118,7 @@ export const LayoutCanvas = () => {
               moveRow={moveRow}
               moveColumn={moveColumn}
               moveComponent={moveComponent}
+              resizeColumn={resizeColumn}
             />
           ))}
 

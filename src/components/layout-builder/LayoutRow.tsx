@@ -2,7 +2,7 @@ import React, { useRef } from "react";
 import { useDrop, useDrag } from "react-dnd";
 import { LayoutColumn } from "./LayoutColumn";
 
-export const LayoutRow = ({ row, rowIndex, setCanvas, moveRow, moveColumn, moveComponent }) => {
+export const LayoutRow = ({ row, rowIndex, setCanvas, moveRow, moveColumn, moveComponent, resizeColumn }) => {
   const ref = useRef(null);
 
   const [{ isDragging }, drag] = useDrag(() => ({
@@ -70,6 +70,8 @@ export const LayoutRow = ({ row, rowIndex, setCanvas, moveRow, moveColumn, moveC
               setCanvas={setCanvas}
               moveColumn={moveColumn}
               moveComponent={moveComponent}
+              resizeColumn={resizeColumn}
+              isLastColumn={colIndex === row.columns.length - 1}
             />
           ))
         )}

@@ -3,7 +3,7 @@ export type ItemType = "ROW" | "COLUMN" | "COMPONENT";
 
 export interface ColumnNode {
   id: string;
-  
+  width?: number;
   components: ComponentNode[];
 }
 
@@ -19,7 +19,7 @@ export interface CanvasState {
 
 export type ComponentKind = "INPUT" | "IMAGE" | "DEMO";
 
-export type ColumnDropType = "COMPONENT"; 
+export type ColumnDropType = "COMPONENT";
 
 
 

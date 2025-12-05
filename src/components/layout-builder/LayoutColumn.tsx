@@ -2,7 +2,7 @@ import React, { useRef } from "react";
 import { useDrop, useDrag } from "react-dnd";
 import { ComponentCard } from "./ComponentCard";
 
-export const LayoutColumn = ({ column, rowIndex, colIndex, setCanvas, moveColumn, moveComponent }) => {
+export const LayoutColumn = ({ column, rowIndex, colIndex, setCanvas, moveColumn, moveComponent, resizeColumn, isLastColumn }) => {
   const ref = useRef(null);
 
   const [{ isDragging }, drag] = useDrag(() => ({
@@ -75,10 +75,6 @@ export const LayoutColumn = ({ column, rowIndex, colIndex, setCanvas, moveColumn
            
            item.rowIndex = hoverRowIndex;
            item.colIndex = hoverColIndex;
-           // We don't strictly need to update compIndex here as it will be updated by the re-render and subsequent hovers, 
-           // but for correctness in the same drag session:
-           // If moving within same list, index is length-1. If from other list, index is length.
-           // But let's just leave it, the next hover on a card will fix it if we move over a card.
         }
       }
     }
@@ -86,12 +82,58 @@ export const LayoutColumn = ({ column, rowIndex, colIndex, setCanvas, moveColumn
 
   drag(drop(ref));
 
+  const handleMouseDown = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const startX = e.clientX;
+    const rowWidth = ref.current?.parentElement?.offsetWidth;
+
+    if (!rowWidth) return;
+
+    const handleMouseMove = (moveEvent: MouseEvent) => {
+      const deltaX = moveEvent.clientX - startX;
+      // Reset startX to avoid accumulating delta if we wanted incremental updates, 
+      // but here resizeColumn takes total delta from start? 
+      // No, resizeColumn implementation takes deltaX.
+      // If I call resizeColumn repeatedly, I should pass incremental delta or absolute?
+      // My resizeColumn implementation:
+      // col.width = (col.width || 1) + deltaWeight;
+      // It uses current state. So if I call it multiple times, I should pass incremental delta.
+      // But `startX` is fixed. `moveEvent.clientX - startX` is total delta from start.
+      // If I use total delta, I need to apply it to the *initial* width.
+      // But I don't have initial width here easily unless I capture it on MouseDown.
+      // Alternatively, I can use incremental delta.
+    };
+    
+    // Let's switch to incremental delta.
+    let lastX = startX;
+    
+    const handleMouseMoveIncremental = (moveEvent: MouseEvent) => {
+        const currentX = moveEvent.clientX;
+        const deltaX = currentX - lastX;
+        if (deltaX !== 0) {
+            resizeColumn(rowIndex, colIndex, deltaX, rowWidth);
+            lastX = currentX;
+        }
+    };
+
+    const handleMouseUp = () => {
+      document.removeEventListener("mousemove", handleMouseMoveIncremental);
+      document.removeEventListener("mouseup", handleMouseUp);
+    };
+
+    document.addEventListener("mousemove", handleMouseMoveIncremental);
+    document.addEventListener("mouseup", handleMouseUp);
+  };
+
   return (
     <div
       ref={ref}
-      className={`flex-1 min-w-[150px] sm:min-w-[200px] p-3 rounded-lg border-4 border-slate-400 ${isDragging ? "opacity-50" : ""}`}
+      style={{ flex: `${column.width || 1} 1 0px` }}
+      className={`relative flex-1 min-w-[50px] p-3 rounded-lg border-4 border-slate-400 ${isDragging ? "opacity-50" : ""}`}
     >
-      <span className="text-xs block mb-2">column{colIndex}</span>
+      <span className="text-xs block mb-2 text-white">column{colIndex}</span>
       <div className="flex flex-col gap-2 min-h-[50px]">
         {column.components.length > 0 ? (
           column.components.map((comp, compIndex) => (
@@ -110,6 +152,15 @@ export const LayoutColumn = ({ column, rowIndex, colIndex, setCanvas, moveColumn
           </div>
         )}
       </div>
+      
+      {!isLastColumn && (
+        <div
+          className="absolute top-0 -right-2 h-full w-4 cursor-col-resize hover:bg-blue-400/20 z-10 flex items-center justify-center group"
+          onMouseDown={handleMouseDown}
+        >
+            <div className="w-1 h-8 bg-slate-300 rounded-full group-hover:bg-blue-500 transition-colors" />
+        </div>
+      )}
     </div>
   );
 };
