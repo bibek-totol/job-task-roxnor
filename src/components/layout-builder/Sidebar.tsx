@@ -80,9 +80,8 @@ export const Sidebar = () => {
         <div className="mt-6 p-3 rounded-lg bg-card text-sm text-green-300">
           <strong>Pro Tip</strong>
           <div className="text-xs mt-1">
-            Drag Row first, then drop Columns inside it.
-            Components (Input, Image, Demo) must be dropped inside Columns.
-            You can drop full Row in trash box.
+            Drag Row first, then drop Columns inside it. Then drop Components (Input, Image, Demo) inside Columns.
+            You can drop full Row in trash box. Also Components (Input, Image, Demo) can be easily drag and drop to any position inside Grid.
           </div>
         </div>
       </aside>

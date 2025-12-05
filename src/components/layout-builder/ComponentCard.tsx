@@ -9,7 +9,8 @@ export const ComponentCard: React.FC<{
   colIndex: number;
   compIndex: number;
   moveComponent: any;
-}> = ({ comp, rowIndex, colIndex, compIndex, moveComponent }) => {
+  handleItemClick: any;
+}> = ({ comp, rowIndex, colIndex, compIndex, moveComponent, handleItemClick }) => {
   const ref = useRef(null);
   const cfg = {
     input: { title: "Input Component", description: "Text input field", Icon: TextCursorInput },
@@ -64,6 +65,7 @@ export const ComponentCard: React.FC<{
   return (
     <div 
       ref={ref} 
+      onClick={(e) => handleItemClick(e, comp.id,"Component ID: ")}
       className={`component-card p-2 sm:p-3 bg-white rounded-md border flex items-start gap-2 sm:gap-3 shadow-sm ${isDragging ? "opacity-50" : ""}`}
     >
       <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-md bg-secondary/20 flex items-center justify-center">

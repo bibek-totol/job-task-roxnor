@@ -2,7 +2,7 @@ import React, { useRef } from "react";
 import { useDrop, useDrag } from "react-dnd";
 import { ComponentCard } from "./ComponentCard";
 
-export const LayoutColumn = ({ column, rowIndex, colIndex, setCanvas, moveColumn, moveComponent, resizeColumn, isLastColumn }) => {
+export const LayoutColumn = ({ column, rowIndex, colIndex, setCanvas, moveColumn, moveComponent, resizeColumn, isLastColumn, handleItemClick }) => {
   const ref = useRef(null);
 
   const [{ isDragging }, drag] = useDrag(() => ({
@@ -131,6 +131,7 @@ export const LayoutColumn = ({ column, rowIndex, colIndex, setCanvas, moveColumn
     <div
       ref={ref}
       style={{ flex: `${column.width || 1} 1 0px` }}
+      onClick={(e) => handleItemClick(e, colIndex,"Column ID: ")}
       className={`relative flex-1 min-w-[50px] p-3 rounded-lg border-4 border-slate-400 ${isDragging ? "opacity-50" : ""}`}
     >
       <span className="text-xs block mb-2 text-white">column{colIndex}</span>
@@ -144,6 +145,7 @@ export const LayoutColumn = ({ column, rowIndex, colIndex, setCanvas, moveColumn
               colIndex={colIndex}
               compIndex={compIndex}
               moveComponent={moveComponent}
+              handleItemClick={handleItemClick}
             />
           ))
         ) : (

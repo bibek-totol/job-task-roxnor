@@ -105,6 +105,15 @@ export const LayoutCanvas = () => {
     });
   };
 
+  const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleItemClick = (e: React.MouseEvent, id: string, data:string) => {
+    e.stopPropagation();
+    setSelectedItemId(data + id);
+    setIsModalOpen(true);
+  };
+
   return (
     <main ref={drop} className="flex-1 ml-0 md:ml-60 min-h-screen p-4 sm:p-6">
       <div className="max-w-[870px] mx-auto relative">
@@ -119,10 +128,11 @@ export const LayoutCanvas = () => {
               moveColumn={moveColumn}
               moveComponent={moveComponent}
               resizeColumn={resizeColumn}
+              handleItemClick={handleItemClick}
             />
           ))}
 
-          <div className="mt-10 h-24 border-4 border-slate-400 rounded-xl flex items-center justify-center text-muted-foreground">
+          <div className="cursor-pointer mt-10 h-24 border-4 border-slate-400 rounded-xl flex items-center justify-center text-muted-foreground">
             Drag a Row here
           </div>
         </div>
@@ -137,6 +147,25 @@ export const LayoutCanvas = () => {
           {dragType ? <Plus size={80} className="sm:size-[120px] text-green-700" /> : <Trash2 size={80} className="sm:size-[120px] text-red-700" />}
         </div>
       </div>
+
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm" onClick={() => setIsModalOpen(false)}>
+          <div className="bg-white p-6 rounded-xl shadow-xl min-w-[300px] animate-in fade-in zoom-in duration-200" onClick={e => e.stopPropagation()}>
+            <h3 className="text-lg font-bold mb-2">Item ID</h3>
+            <p className="text-muted-foreground font-mono bg-slate-100 p-2 rounded border break-all">
+              {selectedItemId}
+            </p>
+            <div className="mt-4 flex justify-end">
+              <button 
+                onClick={() => setIsModalOpen(false)}
+                className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 };
