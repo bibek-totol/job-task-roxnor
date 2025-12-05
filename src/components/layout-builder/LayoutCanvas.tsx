@@ -35,16 +35,62 @@ export const LayoutCanvas = () => {
       });
       setDragType(null);
     },
-    hover: (_, monitor) => setDragType(monitor.getItemType()),
+    hover: (_, monitor) => setDragType(monitor.getItemType() as string),
     collect: monitor => { if (!monitor.isOver()) setDragType(null); }
   }));
+
+  const moveRow = (dragIndex: number, hoverIndex: number) => {
+    setCanvas((prev) => {
+      const updated = structuredClone(prev);
+      const [draggedRow] = updated.rows.splice(dragIndex, 1);
+      updated.rows.splice(hoverIndex, 0, draggedRow);
+      return updated;
+    });
+  };
+
+  const moveColumn = (sourceRowIndex: number, sourceColIndex: number, targetRowIndex: number, targetColIndex: number) => {
+    setCanvas((prev) => {
+      const updated = structuredClone(prev);
+      const sourceColumns = updated.rows[sourceRowIndex].columns;
+      const targetColumns = updated.rows[targetRowIndex].columns;
+      const [draggedCol] = sourceColumns.splice(sourceColIndex, 1);
+      targetColumns.splice(targetColIndex, 0, draggedCol);
+      return updated;
+    });
+  };
+
+  const moveComponent = (
+    sourceRowIndex: number,
+    sourceColIndex: number,
+    sourceCompIndex: number,
+    targetRowIndex: number,
+    targetColIndex: number,
+    targetCompIndex: number
+  ) => {
+    setCanvas((prev) => {
+      const updated = structuredClone(prev);
+      const sourceComps = updated.rows[sourceRowIndex].columns[sourceColIndex].components;
+      const targetComps = updated.rows[targetRowIndex].columns[targetColIndex].components;
+      const [draggedComp] = sourceComps.splice(sourceCompIndex, 1);
+      targetComps.splice(targetCompIndex, 0, draggedComp);
+      return updated;
+    });
+  };
 
   return (
     <main ref={drop} className="flex-1 ml-0 md:ml-60 min-h-screen p-4 sm:p-6">
       <div className="max-w-[870px] mx-auto relative">
         <div className="p-4 sm:p-6 rounded-3xl bg-card/60 border shadow-sm flex flex-col gap-6">
           {canvas.rows.map((row, rowIndex) => (
-            <LayoutRow key={row.id} row={row} rowIndex={rowIndex} setCanvas={setCanvas} />
+            <LayoutRow
+              key={row.id}
+              row={row}
+              rowIndex={rowIndex}
+              setCanvas={setCanvas}
+              moveRow={moveRow}
+              moveColumn={moveColumn}
+              moveComponent={moveComponent}
+            />
           ))}
 
           <div className="mt-10 h-24 border-4 border-slate-400 rounded-xl flex items-center justify-center text-muted-foreground">
